@@ -49,15 +49,20 @@ startBtn.addEventListener('click', () => {
     const delta = userSelectedDate - now;
 
     if (delta <= 0) {
-      clearInterval(timerId);
-      updateTimerDisplay(0);
-      iziToast.success({
-        title: 'Done',
-        message: 'Countdown finished!',
-        position: 'topRight',
-      });
-      return;
-    }
+  clearInterval(timerId);
+  updateTimerDisplay(0);
+  iziToast.success({
+    title: 'Done',
+    message: 'Countdown finished!',
+    position: 'topRight',
+  });
+
+  input.disabled = false;
+  startBtn.disabled = true;
+
+  return;
+}
+
 
     updateTimerDisplay(delta);
   }, 1000);
