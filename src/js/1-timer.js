@@ -1,21 +1,23 @@
 
-
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
+
 import iziToast from "izitoast";
 import "izitoast/dist/css/iziToast.min.css";
 
-const startBtn = document.querySelector("[data-start]");
-const datetimePicker = document.querySelector("#datetime-picker");
-const daysEl = document.querySelector("[data-days]");
-const hoursEl = document.querySelector("[data-hours]");
-const minutesEl = document.querySelector("[data-minutes]");
-const secondsEl = document.querySelector("[data-seconds]");
+const startBtn = document.querySelector('[data-start]');
+const input = document.querySelector('#datetime-picker');
+const daysEl = document.querySelector('[data-days]');
+const hoursEl = document.querySelector('[data-hours]');
+const minutesEl = document.querySelector('[data-minutes]');
+const secondsEl = document.querySelector('[data-seconds]');
 
+let timerId = null;
 let userSelectedDate = null;
-let timerInterval = null;
 
-const options = {
+startBtn.disabled = true;
+
+flatpickr(input, {
   enableTime: true,
   time_24hr: true,
   defaultDate: new Date(),
@@ -34,26 +36,30 @@ const options = {
       startBtn.disabled = false;
     }
   },
-};
+});
 
-flatpickr(datetimePicker, options);
+startBtn.addEventListener('click', () => {
+  if (!userSelectedDate) return;
 
-startBtn.addEventListener("click", () => {
   startBtn.disabled = true;
-  datetimePicker.disabled = true;
+  input.disabled = true;
 
-  timerInterval = setInterval(() => {
+  timerId = setInterval(() => {
     const now = new Date();
-    const timeRemaining = userSelectedDate - now;
+    const delta = userSelectedDate - now;
 
-    if (timeRemaining <= 0) {
-      clearInterval(timerInterval);
+    if (delta <= 0) {
+      clearInterval(timerId);
       updateTimerDisplay(0);
-      datetimePicker.disabled = false;
+      iziToast.success({
+        title: 'Done',
+        message: 'Countdown finished!',
+        position: 'topRight',
+      });
       return;
     }
 
-    updateTimerDisplay(timeRemaining);
+    updateTimerDisplay(delta);
   }, 1000);
 });
 
@@ -66,7 +72,7 @@ function updateTimerDisplay(ms) {
 }
 
 function addLeadingZero(value) {
-  return String(value).padStart(2, "0");
+  return String(value).padStart(2, '0');
 }
 
 function convertMs(ms) {
